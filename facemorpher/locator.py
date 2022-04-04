@@ -7,13 +7,13 @@ import numpy as np
 import os.path as path
 import dlib
 import os
+import stasm
 
 
-DATA_DIR = os.environ.get(
-  'DLIB_DATA_DIR',
-  path.join(path.dirname(path.dirname(path.realpath(__file__))), 'data')
-)
+# DATA_DIR = os.environ.get('DLIB_DATA_DIR',path.join(path.dirname(path.dirname(path.realpath(__file__))), 'data'))
+DATA_DIR = path.join(os.getcwd(),'data')
 dlib_detector = dlib.get_frontal_face_detector()
+#dlib_detector = dlib.cnn_face_detection_model_v1(path.join(DATA_DIR, 'mmod_human_face_detector.dat'))
 dlib_predictor = dlib.shape_predictor(path.join(DATA_DIR, 'shape_predictor_68_face_landmarks.dat'))
 
 def boundary_points(points, width_percent=0.1, height_percent=0.1):
@@ -32,6 +32,29 @@ def boundary_points(points, width_percent=0.1, height_percent=0.1):
 
 def face_points(img, add_boundary_points=True):
   return face_points_dlib(img, add_boundary_points)
+'''
+def face_points(img, add_boundary_points=True):
+  """ Locates 77 face points using stasm (http://www.milbo.users.sonic.net/stasm)
+
+  :param img: an image array
+  :param add_boundary_points: bool to add 2 additional points
+  :returns: Array of x,y face points. Empty array if no face found
+  """
+  try:
+    points = stasm.search_single(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))
+  except Exception as e:
+    print('Failed finding face points: ', e)
+    return []
+
+  points = points.astype(np.int32)
+  if len(points) == 0:
+    return points
+
+  if add_boundary_points:
+    return np.vstack([points, boundary_points(points)])
+
+  return points
+'''
 
 def face_points_dlib(img, add_boundary_points=True):
   """ Locates 68 face points using dlib (http://dlib.net)

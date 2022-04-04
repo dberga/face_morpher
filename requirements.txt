@@ -3,3 +3,5 @@ scipy
 matplotlib
 docopt
 dlib
+opencv-python==4.1.2.30
+stasm
